@@ -1,0 +1,9 @@
+{
+  "name": "qore-mcpb-server",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Bundled stdio->HTTP proxy for the hosted Qore MCP server.",
+  "dependencies": {
+    "mcp-remote": "0.14.2"
+  }
+}

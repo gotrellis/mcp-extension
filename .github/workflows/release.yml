@@ -1,0 +1,26 @@
+name: release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+      # Not `npm ci --omit=dev`: the packed bundle carries its own node_modules, and a
+      # lockfile install is what makes two builds of one tag byte-identical.
+      - run: npm ci --omit=dev
+        working-directory: server
+      - run: npx --yes @anthropic-ai/mcpb@2.1.2 validate .
+      - run: npx --yes @anthropic-ai/mcpb@2.1.2 pack . "qore-mcp-${GITHUB_REF_NAME#v}.mcpb"
+      - run: gh release create "$GITHUB_REF_NAME" "qore-mcp-${GITHUB_REF_NAME#v}.mcpb" --generate-notes
+        env:
+          GH_TOKEN: ${{ github.token }}
