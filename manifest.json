@@ -2,7 +2,7 @@
   "manifest_version": "0.3",
   "name": "qore-mcp",
   "display_name": "Qore",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Ask your Amazon, Walmart and TikTok Shop data questions in plain English — sales, ad spend, search terms, placements and catalog, from the accounts your Qore organization has already connected.",
   "long_description": "Qore connects Claude to the marketplace and retail-media accounts your organization has already authorized in Qore — Amazon Ads and Seller Central, Walmart, TikTok Shop, Google Ads, Shopify, MerchantSpring and Jungle Scout — so you can stop exporting reports and pasting them into a chat.\n\nAsk it \"what were my top 10 products by ad sales last month?\", \"which search terms burned spend with no sales in the last 30 days?\" or \"how are today's sales tracking against yesterday, hour by hour?\" and it reads the live data and answers.\n\n**How access works.** You sign in with your own Qore account and pick one organization to connect; there is no API key to copy or paste. The connection reaches exactly the connectors you can reach in Qore and nothing more, and it is scoped to the one organization you chose at sign-in. Revoke it any time from Connected apps in Qore.\n\n**What it can reach.** The tool surface is derived from the platforms your organization has connected, so an Amazon-only organization sees Amazon's tools. When you have more than one brand on a platform, name the brand in your question — or ask which ones it can see. Some tools change things in the connected ad account, so leave your assistant's tool-approval prompts switched on.",
   "author": {
@@ -26,7 +26,7 @@
     "analytics"
   ],
   "privacy_policies": [
-    "https://www.gotrellis.com/privacy"
+    "https://gotrellis.com/privacy-policy"
   ],
   "server": {
     "type": "node",
