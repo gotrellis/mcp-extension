@@ -3,6 +3,11 @@ name: release
 on:
   push:
     tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Version to release, without the leading v. Must match manifest.json.
+        required: true
 
 permissions:
   contents: write
@@ -15,12 +20,33 @@ jobs:
       - uses: actions/setup-node@v5
         with:
           node-version: 22
-      # Not `npm ci --omit=dev`: the packed bundle carries its own node_modules, and a
-      # lockfile install is what makes two builds of one tag byte-identical.
+
+      # Through the input rather than interpolated into the script: a ${{ }} inside a run
+      # block is pasted as source, and this one is caller-supplied.
+      - id: version
+        env:
+          INPUT_VERSION: ${{ inputs.version }}
+        run: |
+          version="${INPUT_VERSION:-${GITHUB_REF_NAME#v}}"
+          manifest=$(node -p "require('./manifest.json').version")
+          if [ "$version" != "$manifest" ]; then
+            echo "release $version does not match manifest version $manifest" >&2
+            exit 1
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      # Not `npm install`: a lockfile install is what makes two builds of one version
+      # byte-identical, and the packed bundle carries these node_modules.
       - run: npm ci --omit=dev
         working-directory: server
+
       - run: npx --yes @anthropic-ai/mcpb@2.1.2 validate .
-      - run: npx --yes @anthropic-ai/mcpb@2.1.2 pack . "qore-mcp-${GITHUB_REF_NAME#v}.mcpb"
-      - run: gh release create "$GITHUB_REF_NAME" "qore-mcp-${GITHUB_REF_NAME#v}.mcpb" --generate-notes
+      - run: npx --yes @anthropic-ai/mcpb@2.1.2 pack . "qore-mcp-${VERSION}.mcpb"
         env:
+          VERSION: ${{ steps.version.outputs.version }}
+
+      # Creates the tag when dispatched; a tag push has already made it.
+      - run: gh release create "v${VERSION}" "qore-mcp-${VERSION}.mcpb" --target "$GITHUB_SHA" --generate-notes
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
           GH_TOKEN: ${{ github.token }}
